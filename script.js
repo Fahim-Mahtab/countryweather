@@ -1,4 +1,4 @@
-// DOM Elements
+
 const countryInput = document.getElementById('country-input');
 const searchBtn = document.getElementById('search-btn');
 const suggestionsContainer = document.querySelector('.suggestions');
@@ -11,7 +11,7 @@ const modalBody = document.getElementById('modal-body');
 const hamburger = document.querySelector('.hamburger');
 const navLinks = document.querySelector('.nav-links');
 
-// API Key for OpenWeatherMap
+
 const weatherApiKey = '4480fff3ac8ca5d4aac169413a2598c7';
 
 // Event Listeners
@@ -279,4 +279,65 @@ function displayCountryDetails(country, weatherHTML) {
 function closeModal() {
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
+}
+// Add this with other DOM element selections at the top
+const contactForm = document.querySelector('.contact-form');
+
+// Add this with other event listeners
+contactForm.addEventListener('submit', handleFormSubmit);
+
+// Add this function with other functions
+function handleFormSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'form-message success';
+            successMsg.textContent = 'Message sent successfully!';
+            form.appendChild(successMsg);
+            
+            // Reset form
+            form.reset();
+            
+            // Remove message after 5 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 5000);
+        } else {
+            throw new Error('Network response was not ok');
+        }
+    })
+    .catch(error => {
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'form-message error';
+        errorMsg.textContent = 'Failed to send message. Please try again later.';
+        form.appendChild(errorMsg);
+        
+        // Remove message after 5 seconds
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 5000);
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+    });
 }
